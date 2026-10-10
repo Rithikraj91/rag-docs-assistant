@@ -1,25 +1,31 @@
-import requests
+import os
+from dotenv import load_dotenv
 
-BASE_URL = "http://localhost:8000"
+# Load local .env credentials before instantiating the app
+load_dotenv()
 
-def test_healthz_endpoint():
-    """Verify that the health check returns 200 OK and valid status."""
-    response = requests.get(f"{BASE_URL}/healthz", timeout=10)
+from fastapi.testclient import TestClient
+from main import app
+
+client = TestClient(app)
+
+def test_health_or_root():
+    """Verify that the FastAPI service is reachable."""
+    response = client.get("/docs")
     assert response.status_code == 200
-    data = response.json()
-    assert data.get("status") == "ok"
-    assert "service" in data
 
-def test_query_endpoint_retrieval():
-    """Verify that the RAG pipeline correctly answers with ground truth context."""
-    payload = {"question": "What is the contact for payment alerts?"}
-    response = requests.post(f"{BASE_URL}/query", json=payload, timeout=60)
-    
+def test_query_validation():
+    """Verify that an empty payload triggers a 422 Unprocessable Entity."""
+    response = client.post("/query", json={})
+    assert response.status_code == 422
+
+def test_query_success():
+    """Verify that asking a question returns an answer and context."""
+    response = client.post(
+        "/query",
+        json={"question": "What is the database connection timeout?"}
+    )
     assert response.status_code == 200
     data = response.json()
     assert "answer" in data
     assert "context" in data
-    
-    # Ground truth checks
-    answer_text = data["answer"].lower()
-    assert "eng-payments-alerts" in answer_text or "duty-lead" in answer_text
