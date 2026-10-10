@@ -1,0 +1,7 @@
+Service Name: Payment-Gateway-V2
+Owner Team: Core Banking Platform
+Deployment Target: Production Kubernetes cluster 'prod-us-east-1', namespace 'fintech'.
+Current Replicas: 3 pods running behind Nginx Ingress.
+Database: Connects to PostgreSQL RDS at 'pg-prod-cluster.internal'. Connection timeout is 5000ms.
+Runbook Alert RB-402: If API error rate spikes above 2%, first verify Redis token cache connectivity, then restart the auth-cache pod before scaling up worker replicas.
+On-Call Contact: Reach out to the #eng-payments-alerts Slack channel or page user @duty-lead.
