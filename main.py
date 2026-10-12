@@ -8,11 +8,13 @@ from langchain_chroma import Chroma
 from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI(
     title="RAG DevOps Documentation Assistant",
     version="1.0.0"
 )
+Instrumentator().instrument(app).expose(app)
 
 # Request schema
 class QueryRequest(BaseModel):
